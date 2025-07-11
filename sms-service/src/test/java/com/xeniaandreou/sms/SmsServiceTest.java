@@ -1,7 +1,5 @@
 package com.xeniaandreou.sms;
 
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,19 +7,16 @@ import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
 
-@QuarkusTest
 public class SmsServiceTest {
 
-    @Inject
-    SmsService smsService;
-
-    Emitter<SmsMessage> mockEmitter;
+    private SmsService smsService;
+    private Emitter mockEmitter;
 
     @BeforeEach
     void setUp() {
-        // Create a mock emitter and inject it manually
         mockEmitter = Mockito.mock(Emitter.class);
-        smsService.emitter = mockEmitter;
+        smsService = new SmsService();
+        smsService.emitter = mockEmitter; // assumes emitter is public or package-private
     }
 
     @Test
@@ -33,8 +28,6 @@ public class SmsServiceTest {
 
         smsService.validateAndQueue(msg);
 
-        // Verify that send() was called on the emitter
-        verify(mockEmitter, times(1)).send(any(SmsMessage.class));
+        verify(mockEmitter, times(1)).send(eq(msg));
     }
 }
-
